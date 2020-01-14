@@ -32,8 +32,6 @@
               v-if="resizable && !isAutoHeight"
               :min-width="minWidth"
               :min-height="minHeight"
-              :max-width="maxWidth"
-              :max-height="maxHeight"
               @resize="handleModalResize"
             />
           </div>
@@ -293,7 +291,7 @@ export default {
         ? window.width / 100 * modal.width
         : modal.width
 
-      const max = Math.max(minWidth, Math.min(window.width, maxWidth))
+      const max = Math.min(window.width, maxWidth)
 
       return adaptive
         ? inRange(minWidth, max, value)
@@ -306,7 +304,7 @@ export default {
      * Returns modal.renderedHeight if height set as "auto"
      */
     trueModalHeight () {
-      const { window, modal, isAutoHeight, adaptive, minHeight, maxHeight } = this
+      const { window, modal, isAutoHeight, adaptive, maxHeight } = this
 
       const value = modal.heightType === '%'
         ? window.height / 100 * modal.height
@@ -317,10 +315,10 @@ export default {
         return this.modal.renderedHeight
       }
 
-      const max = Math.max(minHeight, Math.min(window.height, maxHeight))
+      const max = Math.min(window.height, maxHeight)
 
       return adaptive
-        ? inRange(minHeight, max, value)
+        ? inRange(this.minHeight, max, value)
         : value
     },
     /**
@@ -412,7 +410,8 @@ export default {
       }
     },
 
-    handleWindowResize () {
+    handleWindowResize () {    
+    
       this.window.width = window.innerWidth
       this.window.height = window.innerHeight
 
@@ -432,9 +431,9 @@ export default {
      * Event handler which is triggered on modal resize
      */
     handleModalResize (event) {
+
       this.modal.widthType = 'px'
       this.modal.width = event.size.width
-
       this.modal.heightType = 'px'
       this.modal.height = event.size.height
 
@@ -562,8 +561,7 @@ export default {
         const handleDraggableMousedown = event => {
           let target = event.target
 
-          if (target &&
-              (target.nodeName === 'INPUT' || target.nodeName === 'TEXTAREA')) {
+          if (target && target.nodeName === 'INPUT') {
             return
           }
 
@@ -672,10 +670,13 @@ export default {
       const maxTop = window.height - trueModalHeight
 
       const left = shift.left + pivotX * maxLeft
-      const top = shift.top + pivotY * maxTop
+      // FIXME: this calculates wrong, so inserted 0 // ben 20200114
+      const top = 0 //shift.top + pivotY * maxTop
 
       this.shift.left -= left - inRange(0, maxLeft, left)
-      this.shift.top -= top - inRange(0, maxTop, top)
+      // FIXME: see above, so inserted 0 // ben 20200114
+      this.shift.top -= 0 //top - inRange(0, maxTop, top)
+
     }
   }
 }
